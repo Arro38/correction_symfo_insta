@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -20,7 +21,7 @@ class RegistrationController extends AbstractController
             $email = $request->request->get('email');
             $password = $request->request->get('password');
             $username = $request->request->get('username');
-            // TODO ADD ProfilPicture
+            $profilePicture = $request->files->get('profilePicture');
 
             if ($email === null || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 throw new \Exception('Invalid email');
@@ -34,6 +35,10 @@ class RegistrationController extends AbstractController
                 throw new \Exception('Invalid username');
             }
 
+            if ($profilePicture === null || !$profilePicture instanceof UploadedFile) {
+                throw new \Exception('Invalid profile picture');
+            }
+
             $user->setEmail($email);
             $hashedPassword = $passwordHasher->hashPassword(
                 $user,
@@ -41,6 +46,7 @@ class RegistrationController extends AbstractController
             );
             $user->setPassword($hashedPassword);
             $user->setUsername($username);
+            $user->setImageFile($profilePicture);
             $em->persist($user);
             $em->flush();
 
