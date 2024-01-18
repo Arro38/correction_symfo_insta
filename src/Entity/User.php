@@ -37,7 +37,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column()]
     private ?string $imageName = null;
 
-    #[ORM\Column(length: 180)]
+    #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
     /**
@@ -58,6 +58,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // otherwise the event listeners won't be called and the file is lost
             $this->updatedAt = new \DateTimeImmutable();
         }
+    }
+
+    public function getImageUrl(): ?string
+    {
+        return '/uploads/profiles/' . $this->imageName;
     }
 
     public function getImageFile(): ?File
